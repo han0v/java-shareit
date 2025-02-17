@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 
+@UtilityClass
 public class ItemMapper {
     public static Item toEntity(ItemDto itemDto) {
         Item item = new Item();
@@ -12,11 +14,10 @@ public class ItemMapper {
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
 
-        // Обрабатываем поле request
         if (itemDto.getRequest() != null) {
             item.setRequest(ItemRequestMapper.toEntity(itemDto.getRequest()));
         } else {
-            item.setRequest(null); // Явно устанавливаем null, если requestDto равен null
+            item.setRequest(null);
         }
 
         return item;

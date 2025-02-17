@@ -59,16 +59,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByUser(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByUser(Long userId, Booking.Status state) {
         User user = userRepository.findById(userId);
-        if (!List.of("WAITING", "APPROVED", "REJECTED", "CANCELED").contains(state)) {
-            throw new RuntimeException("Unknown state: " + state);
-        }
 
-        List<Booking> bookings = bookingRepository.findAllByBookerAndStatus(user, Booking.Status.valueOf(state));
+        List<Booking> bookings = bookingRepository.findAllByBookerAndStatus(user, state);
 
         return bookings.stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 }

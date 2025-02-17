@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//Поздно понял что создавать логику для Booking и ItemRequest не надо реализовывать в этом спринте, а потому реализовал
-//некоторую часть скорее всего неверную, удалять не хочу, мало ли пригодится для дальнейшей разработки
-
 @Repository
 public class BookingRepository {
     private final Map<Long, Booking> bookings = new HashMap<>();

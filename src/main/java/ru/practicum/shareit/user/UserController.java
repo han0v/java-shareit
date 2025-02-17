@@ -40,7 +40,6 @@ public class UserController {
 
         if (!existingUser.getEmail().equals(userDto.getEmail())) {
             if (userService.isEmailAlreadyRegistered(userDto.getEmail())) {
-                log.error("Пользователь с email {} уже зарегистрирован", userDto.getEmail());
                 throw new IllegalArgumentException("Пользователь с таким email уже зарегистрирован");
             }
         }
@@ -63,7 +62,6 @@ public class UserController {
 
     private void validateUser(UserDto user) {
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
-            log.error("Некорректный email: {}", user.getEmail());
             throw new ValidationException("Некорректный email");
         }
 

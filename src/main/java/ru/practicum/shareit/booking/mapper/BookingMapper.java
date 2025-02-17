@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -7,6 +8,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+@UtilityClass
 public class BookingMapper {
 
     public static BookingDto toDto(Booking booking) {
@@ -33,5 +35,13 @@ public class BookingMapper {
             booking.setStatus(Booking.Status.valueOf(bookingDto.getStatus()));
         }
         return booking;
+    }
+
+    public static Booking.Status getStatusFromString(String state) {
+        try {
+            return Booking.Status.valueOf(state.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Unknown state: " + state);
+        }
     }
 }
