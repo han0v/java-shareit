@@ -1,12 +1,62 @@
 package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.comments.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 
+import java.util.List;
+
 @UtilityClass
 public class ItemMapper {
+
+    // Преобразование Item в ItemDto
+    public static ItemDto toDto(Item item) {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setName(item.getName());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setAvailable(item.getAvailable());
+
+        if (item.getRequest() != null) {
+            itemDto.setRequest(ItemRequestMapper.toDto(item.getRequest()));
+        } else {
+            itemDto.setRequest(null);
+        }
+
+        return itemDto;
+    }
+
+    // Преобразование Item в ItemWithBookingsDto (без комментариев)
+    public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
+        return toItemWithBookingsDto(item, lastBooking, nextBooking, null);
+    }
+
+    // Преобразование Item в ItemWithBookingsDto (с комментариями)
+    public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking, List<CommentDto> comments) {
+        ItemWithBookingsDto itemWithBookingsDto = new ItemWithBookingsDto();
+        itemWithBookingsDto.setId(item.getId());
+        itemWithBookingsDto.setName(item.getName());
+        itemWithBookingsDto.setDescription(item.getDescription());
+        itemWithBookingsDto.setAvailable(item.getAvailable());
+
+        if (item.getRequest() != null) {
+            itemWithBookingsDto.setRequest(ItemRequestMapper.toDto(item.getRequest()));
+        } else {
+            itemWithBookingsDto.setRequest(null);
+        }
+
+        itemWithBookingsDto.setLastBooking(lastBooking);
+        itemWithBookingsDto.setNextBooking(nextBooking);
+        itemWithBookingsDto.setComments(comments); // Добавляем комментарии
+
+        return itemWithBookingsDto;
+    }
+
+    // Преобразование ItemDto в Item
     public static Item toEntity(ItemDto itemDto) {
         Item item = new Item();
         item.setId(itemDto.getId());
@@ -21,22 +71,5 @@ public class ItemMapper {
         }
 
         return item;
-    }
-
-    public static ItemDto toDto(Item item) {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(item.getId());
-        itemDto.setName(item.getName());
-        itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getAvailable());
-
-        // Обрабатываем поле request
-        if (item.getRequest() != null) {
-            itemDto.setRequest(ItemRequestMapper.toDto(item.getRequest()));
-        } else {
-            itemDto.setRequest(null); // Явно устанавливаем null, если request равен null
-        }
-
-        return itemDto;
     }
 }
