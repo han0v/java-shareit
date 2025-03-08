@@ -34,7 +34,6 @@ public class ItemRequestRepository {
         requests.remove(id);
     }
 
-    // Получение всех запросов пользователя
     public List<ItemRequest> findAllByRequestor(User requestor) {
         List<ItemRequest> result = new ArrayList<>();
         for (ItemRequest request : requests.values()) {
