@@ -13,7 +13,7 @@ public class ItemWithBookingsDto {
     private String name;
     private String description;
     private Boolean available;
-    private ItemRequestDto request; // Добавлено поле request
+    private ItemRequestDto request;
     private BookingDto lastBooking;
     private BookingDto nextBooking;
     private List<CommentDto> comments;

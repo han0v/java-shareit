@@ -6,7 +6,7 @@ import ru.practicum.shareit.comments.model.Comment;
 
 @UtilityClass
 public class CommentMapper {
-    public static CommentDto toDto(Comment comment) {
+    public CommentDto toDto(Comment comment) {
         CommentDto commentDto = new CommentDto();
         commentDto.setId(comment.getId());
         commentDto.setText(comment.getText());
@@ -15,7 +15,7 @@ public class CommentMapper {
         return commentDto;
     }
 
-    public static Comment toEntity(CommentDto commentDto) {
+    public Comment toEntity(CommentDto commentDto) {
         Comment comment = new Comment();
         comment.setText(commentDto.getText());
         comment.setCreated(commentDto.getCreated());
