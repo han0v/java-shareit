@@ -11,7 +11,8 @@ public class BookingDto {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private ItemDto item;
+    private Long itemId; // Для запроса (только itemId)
+    private ItemDto item; // Для ответа (полный объект ItemDto)
     private UserDto booker;
     private String status;
 }
