@@ -109,10 +109,12 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllRequests_NoRequests_ReturnsEmptyList() {
-        User anotherUser = new User(null, "Another User", "another@mail.com");
-        em.persist(anotherUser);
+        itemRequestRepository.deleteAll();
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequests(anotherUser.getId());
+        User newUser = new User(null, "New User", "new@mail.com");
+        em.persist(newUser);
+
+        List<ItemRequestDto> result = itemRequestService.getAllRequests(newUser.getId());
 
         assertTrue(result.isEmpty());
     }
