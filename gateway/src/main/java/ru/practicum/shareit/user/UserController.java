@@ -51,7 +51,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    private void validateUser(UserDto user) {
+    protected void validateUser(UserDto user) {
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
             throw new IllegalArgumentException("Некорректный email");
         }
@@ -62,7 +62,7 @@ public class UserController {
         }
     }
 
-    private void validateEmail(String email) {
+    protected void validateEmail(String email) {
         if (email != null && !email.contains("@")) {
             log.error("Некорректный email: {}", email);
             throw new IllegalArgumentException("Некорректный email");

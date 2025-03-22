@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -47,6 +48,24 @@ class UserControllerTest {
     }
 
     @Test
+    void updateUser_whenValidRequest_returnsOk() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setEmail("valid@email.com");
+        userDto.setName("Updated Name");
+
+        when(userClient.updateUser(eq(1L), any(UserDto.class))).thenReturn(userDto);
+
+        mockMvc.perform(patch("/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("valid@email.com"))
+                .andExpect(jsonPath("$.name").value("Updated Name"));
+
+        verify(userClient).updateUser(eq(1L), any(UserDto.class));
+    }
+
+    @Test
     void updateUser_whenInvalidEmail_returnsBadRequest() throws Exception {
         UserDto userDto = new UserDto();
         userDto.setEmail("invalid-email");
@@ -56,7 +75,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isBadRequest());
 
-        verify(userClient, Mockito.never()).updateUser(any(), any());
+        verify(userClient, never()).updateUser(any(), any());
     }
 
     @Test
@@ -88,16 +107,37 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUser_whenEmailInvalidInDto_shouldNotCallClient() throws Exception {
-        UserDto invalidDto = new UserDto();
-        invalidDto.setEmail("invalid");
+    void validateUser_whenEmailIsInvalid_shouldThrowException() {
+        UserDto userDto = new UserDto();
+        userDto.setEmail("invalid-email");
 
-        mockMvc.perform(patch("/users/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest());
+        UserController userController = new UserController(userClient);
 
-        verify(userClient, never()).updateUser(any(), any());
+        assertThrows(IllegalArgumentException.class, () -> {
+            userController.validateUser(userDto);
+        });
+    }
+
+    @Test
+    void validateUser_whenEmailAlreadyRegistered_shouldThrowException() {
+        UserDto userDto = new UserDto();
+        userDto.setEmail("existing@email.com");
+
+        when(userClient.isEmailAlreadyRegistered(userDto.getEmail())).thenReturn(true);
+
+        UserController userController = new UserController(userClient);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            userController.validateUser(userDto);
+        });
+    }
+
+    @Test
+    void validateEmail_whenEmailIsInvalid_shouldThrowException() {
+        UserController userController = new UserController(userClient);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            userController.validateEmail("invalid-email");
+        });
     }
 }
-

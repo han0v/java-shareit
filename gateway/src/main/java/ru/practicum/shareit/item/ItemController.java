@@ -76,14 +76,14 @@ public class ItemController {
                 .body(convertResponse(response, CommentDto.class));
     }
 
-    private <T> T convertResponse(ResponseEntity<Object> response, Class<T> clazz) {
+    protected <T> T convertResponse(ResponseEntity<Object> response, Class<T> clazz) {
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             return objectMapper.convertValue(response.getBody(), clazz);
         }
         throw new RuntimeException("Failed to convert response to " + clazz.getSimpleName());
     }
 
-    private <T> T convertResponse(ResponseEntity<Object> response, TypeReference<T> typeReference) {
+    protected  <T> T convertResponse(ResponseEntity<Object> response, TypeReference<T> typeReference) {
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             return objectMapper.convertValue(response.getBody(), typeReference);
         }

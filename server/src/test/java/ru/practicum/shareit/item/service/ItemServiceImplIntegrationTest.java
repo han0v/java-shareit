@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.service.BookingRepository;
 import ru.practicum.shareit.comments.dto.CommentDto;
 import ru.practicum.shareit.comments.model.Comment;
 import ru.practicum.shareit.comments.service.CommentRepository;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
@@ -22,6 +23,7 @@ import ru.practicum.shareit.user.service.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.booking.Booking.Status.APPROVED;
@@ -68,11 +70,24 @@ class ItemServiceImplIntegrationTest {
 
         ItemDto result = itemService.addItem(owner.getId(), dto);
 
-        // Проверки
         assertNotNull(result.getRequestId());
         assertEquals(request.getId(), result.getRequestId());
         Item savedItem = itemRepository.findById(result.getId()).orElseThrow();
         assertEquals(request.getId(), savedItem.getRequest().getId());
+    }
+
+    @Test
+    @Transactional
+    void addItem_withNonExistentRequest_shouldThrowNotFoundException() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+
+        ItemDto dto = new ItemDto();
+        dto.setRequestId(999L); // Несуществующий запрос
+        dto.setName("Item");
+        dto.setDescription("Desc");
+        dto.setAvailable(true);
+
+        assertThrows(NotFoundException.class, () -> itemService.addItem(owner.getId(), dto));
     }
 
     @Test
@@ -99,15 +114,25 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     @Transactional
+    void updateItem_whenNotOwner_shouldThrowNotFoundException() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        User nonOwner = userRepository.save(createUser("NonOwner", "nonowner@mail.com"));
+        Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
+
+        ItemDto updateDto = new ItemDto();
+        updateDto.setName("Updated Item");
+
+        assertThrows(NotFoundException.class, () -> itemService.updateItem(nonOwner.getId(), item.getId(), updateDto));
+    }
+
+    @Test
+    @Transactional
     void getItemById_withBookingsAndComments_shouldReturnFullInfo() {
-        // Создание пользователей
         User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
         User booker = userRepository.save(createUser("Booker", "booker@mail.com"));
 
-        // Создание предмета
         Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
 
-        // Создание бронирований
         Booking pastBooking = createBooking(
                 LocalDateTime.now().minusDays(2),
                 LocalDateTime.now().minusDays(1),
@@ -122,14 +147,11 @@ class ItemServiceImplIntegrationTest {
         );
         bookingRepository.save(futureBooking);
 
-        // Создание комментария
         Comment comment = createComment("Great item!", item, booker);
         commentRepository.save(comment);
 
-        // Вызов тестируемого метода
         ItemWithBookingsDto result = itemService.getItemById(item.getId());
 
-        // Проверки
         assertAll(
                 () -> assertEquals(pastBooking.getId(), result.getLastBooking().getId()),
                 () -> assertEquals(futureBooking.getId(), result.getNextBooking().getId()),
@@ -138,8 +160,77 @@ class ItemServiceImplIntegrationTest {
         );
     }
 
+    @Test
+    @Transactional
+    void getItemById_withoutBookingsAndComments_shouldReturnBasicInfo() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
+
+        ItemWithBookingsDto result = itemService.getItemById(item.getId());
+
+        assertAll(
+                () -> assertNull(result.getLastBooking()),
+                () -> assertNull(result.getNextBooking()),
+                () -> assertTrue(result.getComments().isEmpty())
+        );
+    }
 
     @Test
+    @Transactional
+    void getAllItemsByOwner_whenNoItems_shouldReturnEmptyList() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+
+        List<ItemDto> result = itemService.getAllItemsByOwner(owner.getId());
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    void getAllItemsByOwner_whenItemsExist_shouldReturnItems() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        itemRepository.save(createItem("Item1", "Desc1", true, owner, null));
+        itemRepository.save(createItem("Item2", "Desc2", true, owner, null));
+
+        List<ItemDto> result = itemService.getAllItemsByOwner(owner.getId());
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    @Transactional
+    void searchItems_withEmptyText_shouldReturnEmptyList() {
+        List<ItemDto> result = itemService.searchItems("");
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    void searchItems_withNonMatchingText_shouldReturnEmptyList() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        itemRepository.save(createItem("Item1", "Desc1", true, owner, null));
+
+        List<ItemDto> result = itemService.searchItems("NonMatchingText");
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    void searchItems_withMatchingText_shouldReturnItems() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        itemRepository.save(createItem("Drill", "Powerful drill", true, owner, null));
+        itemRepository.save(createItem("Hammer", "Heavy hammer", true, owner, null));
+
+        List<ItemDto> result = itemService.searchItems("drill");
+
+        assertEquals(1, result.size());
+        assertEquals("Drill", result.get(0).getName());
+    }
+
+    @Test
+    @Transactional
     void addComment_whenNoPastBookings_shouldThrow() {
         User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
         User user = userRepository.save(createUser("User", "user@mail.com"));
@@ -150,6 +241,56 @@ class ItemServiceImplIntegrationTest {
 
         assertThrows(ValidationException.class,
                 () -> itemService.addComment(user.getId(), item.getId(), commentDto));
+    }
+
+    @Test
+    @Transactional
+    void addComment_whenPastBookingExists_shouldSaveComment() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        User booker = userRepository.save(createUser("Booker", "booker@mail.com"));
+        Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
+
+        Booking pastBooking = createBooking(
+                LocalDateTime.now().minusDays(2),
+                LocalDateTime.now().minusDays(1),
+                item, booker, APPROVED
+        );
+        bookingRepository.save(pastBooking);
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Great item!");
+
+        CommentDto result = itemService.addComment(booker.getId(), item.getId(), commentDto);
+
+        assertNotNull(result.getId());
+        assertEquals("Great item!", result.getText());
+    }
+
+    @Test
+    @Transactional
+    void getCommentsByItemId_whenNoComments_shouldReturnEmptyList() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
+
+        List<CommentDto> result = itemService.getCommentsByItemId(item.getId());
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    void getCommentsByItemId_whenCommentsExist_shouldReturnComments() {
+        User owner = userRepository.save(createUser("Owner", "owner@mail.com"));
+        User booker = userRepository.save(createUser("Booker", "booker@mail.com"));
+        Item item = itemRepository.save(createItem("Item", "Desc", true, owner, null));
+
+        Comment comment = createComment("Great item!", item, booker);
+        commentRepository.save(comment);
+
+        List<CommentDto> result = itemService.getCommentsByItemId(item.getId());
+
+        assertEquals(1, result.size());
+        assertEquals("Great item!", result.get(0).getText());
     }
 
     private User createUser(String name, String email) {
@@ -188,6 +329,4 @@ class ItemServiceImplIntegrationTest {
         comment.setCreated(LocalDateTime.now());
         return comment;
     }
-
-
 }
