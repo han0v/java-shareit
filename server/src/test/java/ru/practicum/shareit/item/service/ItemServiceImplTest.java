@@ -85,7 +85,6 @@ class ItemServiceImplTest {
 
     @Test
     void updateItem_shouldUpdateAvailable() {
-        // Подготовка
         Long userId = 1L;
         Long itemId = 1L;
         ItemDto itemDto = new ItemDto();
@@ -99,10 +98,8 @@ class ItemServiceImplTest {
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
         when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Действие
         ItemDto updatedItemDto = itemService.updateItem(userId, itemId, itemDto);
 
-        // Проверка
         assertNotNull(updatedItemDto);
         assertFalse(updatedItemDto.getAvailable());
         verify(itemRepository, times(1)).save(existingItem);
@@ -110,14 +107,12 @@ class ItemServiceImplTest {
 
     @Test
     void updateItem_shouldThrowNotFoundExceptionIfItemNotFound() {
-        // Подготовка
         Long userId = 1L;
         Long itemId = 1L;
         ItemDto itemDto = new ItemDto();
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
-        // Действие и проверка
         NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             itemService.updateItem(userId, itemId, itemDto);
         });
@@ -128,7 +123,6 @@ class ItemServiceImplTest {
 
     @Test
     void updateItem_shouldThrowNotFoundExceptionIfUserIsNotOwner() {
-        // Подготовка
         Long userId = 1L;
         Long itemId = 1L;
         ItemDto itemDto = new ItemDto();
@@ -139,7 +133,6 @@ class ItemServiceImplTest {
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
 
-        // Действие и проверка
         NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             itemService.updateItem(userId, itemId, itemDto);
         });
@@ -147,4 +140,27 @@ class ItemServiceImplTest {
         assertEquals("Только владелец может редактировать вещь", exception.getMessage());
         verify(itemRepository, never()).save(any(Item.class));
     }
+
+
+    @Test
+    void updateItem_whenUserIsNotOwner_shouldThrowNotFoundException() {
+        Long userId = 1L;
+        Long itemId = 1L;
+        ItemDto itemDto = new ItemDto();
+
+        Item existingItem = new Item();
+        existingItem.setId(itemId);
+        existingItem.setOwner(new User(2L, "Другой владелец", "other@mail.com"));
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            itemService.updateItem(userId, itemId, itemDto);
+        });
+
+        assertEquals("Только владелец может редактировать вещь", exception.getMessage());
+        verify(itemRepository, never()).save(any(Item.class));
+    }
+
+
 }

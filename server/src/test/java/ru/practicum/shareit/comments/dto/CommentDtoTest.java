@@ -1,4 +1,4 @@
-package ru.practicum.shareit.comments;
+package ru.practicum.shareit.comments.dto;
 
 
 import jakarta.validation.Validation;
