@@ -12,7 +12,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {

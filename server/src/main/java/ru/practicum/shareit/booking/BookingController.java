@@ -9,7 +9,9 @@ import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
 
-@Controller
+//Если в сервере пишу аннотацию @Controller вместо @RestController, то работа приложения идет с ошибками
+// и все тесты сразу валятся, поэтому пометил @Controller-ом только gateway
+@RestController
 @RequestMapping("/bookings")
 @RequiredArgsConstructor
 public class BookingController {
