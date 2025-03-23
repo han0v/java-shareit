@@ -13,7 +13,7 @@ import java.util.List;
 @UtilityClass
 public class ItemMapper {
 
-    public static ItemDto toDto(Item item) {
+    public ItemDto toDto(Item item) {
         ItemDto itemDto = new ItemDto();
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
@@ -23,11 +23,11 @@ public class ItemMapper {
         return itemDto;
     }
 
-    public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
+    public ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
         return toItemWithBookingsDto(item, lastBooking, nextBooking, null);
     }
 
-    public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking, List<CommentDto> comments) {
+    public ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking, List<CommentDto> comments) {
         ItemWithBookingsDto itemWithBookingsDto = new ItemWithBookingsDto();
         itemWithBookingsDto.setId(item.getId());
         itemWithBookingsDto.setName(item.getName());
@@ -47,7 +47,7 @@ public class ItemMapper {
         return itemWithBookingsDto;
     }
 
-    public static Item toEntity(ItemDto itemDto) {
+    public Item toEntity(ItemDto itemDto) {
         Item item = new Item();
         item.setId(itemDto.getId());
         item.setName(itemDto.getName());

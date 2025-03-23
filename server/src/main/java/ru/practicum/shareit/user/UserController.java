@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
@@ -9,7 +10,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {

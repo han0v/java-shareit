@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comments.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -11,7 +12,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {

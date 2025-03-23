@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.time.LocalDateTime;
@@ -102,15 +103,13 @@ class BookingControllerTest {
         bookingDto.setEnd(LocalDateTime.now().plusHours(2));
 
         List<BookingDto> bookings = Collections.singletonList(bookingDto);
-
-        when(bookingService.getAllBookingsByOwner(anyLong(), anyString()))
+        when(bookingService.getAllBookingsByOwner(anyLong(), eq(BookingState.ALL)))
                 .thenReturn(bookings);
 
         mockMvc.perform(get("/bookings?state=ALL")
                         .header(USER_ID_HEADER, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L));
-
-        verify(bookingService).getAllBookingsByOwner(eq(1L), eq("ALL"));
+        verify(bookingService).getAllBookingsByOwner(eq(1L), eq(BookingState.ALL));
     }
 }

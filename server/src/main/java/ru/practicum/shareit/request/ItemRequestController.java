@@ -1,13 +1,14 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {

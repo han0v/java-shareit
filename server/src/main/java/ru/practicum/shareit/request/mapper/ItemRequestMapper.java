@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ItemRequestMapper {
-    public static ItemRequestDto toDto(ItemRequest request) {
+    public ItemRequestDto toDto(ItemRequest request) {
         ItemRequestDto requestDto = new ItemRequestDto();
         requestDto.setId(request.getId());
         requestDto.setDescription(request.getDescription());
@@ -35,7 +35,7 @@ public class ItemRequestMapper {
         return requestDto;
     }
 
-    public static ItemRequest toEntity(ItemRequestDto requestDto) {
+    public ItemRequest toEntity(ItemRequestDto requestDto) {
         ItemRequest request = new ItemRequest();
         request.setId(requestDto.getId());
         request.setDescription(requestDto.getDescription());

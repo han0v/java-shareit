@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -75,25 +76,25 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByOwner(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByOwner(Long userId, BookingState state) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
-        switch (state.toUpperCase()) {
-            case "CURRENT":
+        switch (state) {
+            case CURRENT:
                 bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, now, now);
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findAllByBookerAndEndBefore(user, now);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findAllByBookerAndStartAfter(user, now);
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findAllByBookerAndStatus(user, Booking.Status.WAITING);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findAllByBookerAndStatus(user, Booking.Status.REJECTED);
                 break;
             default:

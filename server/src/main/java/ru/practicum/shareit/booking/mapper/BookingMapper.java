@@ -11,7 +11,7 @@ import ru.practicum.shareit.user.model.User;
 @UtilityClass
 public class BookingMapper {
 
-    public static BookingDto toDto(Booking booking) {
+    public BookingDto toDto(Booking booking) {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(booking.getId());
         bookingDto.setStart(booking.getStart());
@@ -22,7 +22,7 @@ public class BookingMapper {
         return bookingDto;
     }
 
-    public static Booking toEntity(BookingDto bookingDto) {
+    public Booking toEntity(BookingDto bookingDto) {
         Booking booking = new Booking();
         booking.setId(bookingDto.getId());
         booking.setStart(bookingDto.getStart());
@@ -37,7 +37,7 @@ public class BookingMapper {
         return booking;
     }
 
-    public static Booking.Status getStatusFromString(String state) {
+    public Booking.Status getStatusFromString(String state) {
         try {
             return Booking.Status.valueOf(state.toUpperCase());
         } catch (IllegalArgumentException e) {

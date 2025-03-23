@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comments.dto.CommentDto;
@@ -16,7 +17,7 @@ import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Validated

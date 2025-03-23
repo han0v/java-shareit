@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemRepository;
@@ -215,7 +216,7 @@ class BookingServiceImplIntegrationTest {
         booking.setStatus(APPROVED);
         bookingRepository.save(booking);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "CURRENT");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.CURRENT);
 
         assertEquals(1, result.size());
         assertEquals(booking.getId(), result.get(0).getId());
@@ -231,7 +232,7 @@ class BookingServiceImplIntegrationTest {
         booking.setStatus(APPROVED);
         bookingRepository.save(booking);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "PAST");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.PAST);
 
         assertEquals(1, result.size());
         assertEquals(booking.getId(), result.get(0).getId());
@@ -247,7 +248,7 @@ class BookingServiceImplIntegrationTest {
         booking.setStatus(APPROVED);
         bookingRepository.save(booking);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "FUTURE");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.FUTURE);
 
         assertEquals(1, result.size());
         assertEquals(booking.getId(), result.get(0).getId());
@@ -263,7 +264,7 @@ class BookingServiceImplIntegrationTest {
         booking.setStatus(WAITING);
         bookingRepository.save(booking);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "WAITING");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.WAITING);
 
         assertEquals(1, result.size());
         assertEquals(booking.getId(), result.get(0).getId());
@@ -279,7 +280,7 @@ class BookingServiceImplIntegrationTest {
         booking.setStatus(REJECTED);
         bookingRepository.save(booking);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "REJECTED");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.REJECTED);
 
         assertEquals(1, result.size());
         assertEquals(booking.getId(), result.get(0).getId());
@@ -303,7 +304,7 @@ class BookingServiceImplIntegrationTest {
         booking2.setStatus(REJECTED);
         bookingRepository.save(booking2);
 
-        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), "ALL");
+        List<BookingDto> result = bookingService.getAllBookingsByOwner(booker.getId(), BookingState.ALL);
 
         assertEquals(2, result.size());
     }
