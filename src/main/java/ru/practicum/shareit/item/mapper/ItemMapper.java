@@ -13,7 +13,6 @@ import java.util.List;
 @UtilityClass
 public class ItemMapper {
 
-    // Преобразование Item в ItemDto
     public static ItemDto toDto(Item item) {
         ItemDto itemDto = new ItemDto();
         itemDto.setId(item.getId());
@@ -30,12 +29,10 @@ public class ItemMapper {
         return itemDto;
     }
 
-    // Преобразование Item в ItemWithBookingsDto (без комментариев)
     public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
         return toItemWithBookingsDto(item, lastBooking, nextBooking, null);
     }
 
-    // Преобразование Item в ItemWithBookingsDto (с комментариями)
     public static ItemWithBookingsDto toItemWithBookingsDto(Item item, BookingDto lastBooking, BookingDto nextBooking, List<CommentDto> comments) {
         ItemWithBookingsDto itemWithBookingsDto = new ItemWithBookingsDto();
         itemWithBookingsDto.setId(item.getId());
@@ -56,20 +53,12 @@ public class ItemMapper {
         return itemWithBookingsDto;
     }
 
-    // Преобразование ItemDto в Item
     public static Item toEntity(ItemDto itemDto) {
         Item item = new Item();
         item.setId(itemDto.getId());
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-
-        if (itemDto.getRequest() != null) {
-            item.setRequest(ItemRequestMapper.toEntity(itemDto.getRequest()));
-        } else {
-            item.setRequest(null);
-        }
-
         return item;
     }
 }
